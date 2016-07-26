@@ -1,3 +1,11 @@
+class Project:
+    def __init__(self, name, github=None, store_url=None, gitter=None, requirements=None):
+        self.name = name
+        self.github = github
+        self.gitter = gitter
+        self.store_url = store_url
+        self.requirements = requirements
+
 prerequisites = {
     'pebble_any': [
         set(['pebble original']),
@@ -16,6 +24,38 @@ prerequisites = {
         set(['freestyle libre', 'android'])
     ]
 }
+
+watchfaces = [
+    Project(
+        name="urchin",
+        github="https://github.com/mddub/urchin-cgm",
+        gitter=None,
+        store_url="beta",
+        requirements=[
+            set(['nightscout', 'pebble_any'])
+        ]
+    ),
+    Project(
+        name="cgm in the sky",
+        github=None,
+        gitter=None,
+        store_url="https://apps.getpebble.com/en_US/application/578a92d21e00a66bb1000199",
+        requirements=[
+            set(['nightscout', 'pebble_any'])
+        ]
+    ),
+    Project(
+        name="simple cgm spark",
+        github="https://github.com/hackingtype1/cgm-simple-spark",
+        gitter=None,
+        store_url="https://apps.getpebble.com/en_US/application/56534d58d2d67de36d00005f",
+        requirements=[
+            set(['nightscout', 'pebble_any'])
+        ]
+    ),
+
+    ]
+
 
 pebble_apps = {
     # Github: https://github.com/mddub/urchin-cgm
@@ -88,4 +128,11 @@ for app in pebble_apps.keys():
     if check_list(pebble_apps[app], have):
         possible_projects.append(app)
 
+possible_watchfaces = []
+
+for project in watchfaces:
+    if check_list(project.requirements, have):
+        possible_watchfaces.append(project.name)
+
 print possible_projects
+print possible_watchfaces
