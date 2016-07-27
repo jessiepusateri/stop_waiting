@@ -1,5 +1,6 @@
 class Project:
-    def __init__(self, name, github=None, store_url=None, gitter=None, requirements=None):
+    def __init__(self, key, name=None, github=None, store_url=None, gitter=None, requirements=None):
+        self.key = key
         self.name = name
         self.github = github
         self.gitter = gitter
@@ -25,18 +26,10 @@ prerequisites = {
     ]
 }
 
-watchfaces = [
+pebble_watchfaces = [
     Project(
-        name="urchin",
-        github="https://github.com/mddub/urchin-cgm",
-        gitter=None,
-        store_url="beta",
-        requirements=[
-            set(['nightscout', 'pebble_any'])
-        ]
-    ),
-    Project(
-        name="cgm in the sky",
+        key="cgm in the sky",
+        name="CGM in the Sky",
         github=None,
         gitter=None,
         store_url="https://apps.getpebble.com/en_US/application/578a92d21e00a66bb1000199",
@@ -45,7 +38,18 @@ watchfaces = [
         ]
     ),
     Project(
-        name="simple cgm spark",
+        key="simple cgm",
+        name="Simple CGM",
+        github="https://github.com/hackingtype1/cgm-simple-pebble",
+        gitter=None,
+        store_url="https://apps.getpebble.com/en_US/application/557c3091d269ce13b300001a",
+        requirements=[
+            set(['nightscout', 'pebble_any'])
+        ]
+    ),
+    Project(
+        key="simple cgm spark",
+        name="Simple CGM Spark",
         github="https://github.com/hackingtype1/cgm-simple-spark",
         gitter=None,
         store_url="https://apps.getpebble.com/en_US/application/56534d58d2d67de36d00005f",
@@ -53,62 +57,62 @@ watchfaces = [
             set(['nightscout', 'pebble_any'])
         ]
     ),
+    Project(
+        key="urchin cgm",
+        name="Urchin CGM",
+        github="https://github.com/mddub/urchin-cgm",
+        gitter=None,
+        store_url=None, #beta - not yet released
+        requirements=[
+            set(['nightscout', 'pebble_any'])
+        ]
+    ),
+    Project(
+        key='nightscout duo',
+        name="Nightscout Duo",
+        github=None,
+        gitter=None,
+        store_url=None,
+        requirements=[
+            set(['nightscout', 'pebble_any'])
+        ]
+    ),
 
-    ]
+]
 
+apple_watch_apps = [
+    Project(
+        key='mybg',
+        name="MyBG",
+        github='https://github.com/nightscout/nightscout-apple-watch',
+        gitter=None,
+        store_url='https://itunes.apple.com/us/app/mybg-continuous-glucose-monitor/id993805949?ls=1&mt=8',
+        requirements=[
+            set(['nightscout', 'apple_watch'])
+        ]
+    ),
+    Project(
+        key='nightscouter',
+        name="Nightscouter",
+        github='https://github.com/someoneAnyone/Nightscouter',
+        gitter=None,
+        store_url='https://itunes.apple.com/us/app/nightscouter/id1010503247?mt=8',
+        requirements=[
+            set(['nightscout', 'apple_watch'])
+        ]
+    ),
+    Project(
+        key='nightguard',
+        name='Nightguard',
+        github='https://github.com/nightscout/nightguard',
+        gitter='https://gitter.im/nightscout/nightguard',
+        store_url=None,
+        requirements=[
+            set(['nightscout', 'apple_watch'])
+        ]
+    ),
 
-pebble_apps = {
-    # Github: https://github.com/mddub/urchin-cgm
-    # Pebble Store: beta - not released yet
-    'urchin':[
-        set(['nightscout', 'pebble_any'])
-    ],
-
-    # Github: ?
-    # Pebble Store: https://apps.getpebble.com/en_US/application/578a92d21e00a66bb1000199
-    'cgm in the sky': [
-        set(['nightscout', 'pebble_any'])
-    ],
-
-    # Github: https://github.com/hackingtype1/cgm-simple-spark
-    # Pebble Store:
-    'simple cgm spark': [
-        set(['nightscout', 'pebble_any'])
-    ],
-
-    # Github: https://github.com/hackingtype1/cgm-simple-pebble
-    # Pebble Store: https://apps.getpebble.com/en_US/application/557c3091d269ce13b300001a
-    'simple cgm': [
-        set(['nightscout', 'pebble_any'])
-    ],
-
-    # Github:
-    # Pebble Store:
-    'nightscout duo': [
-        set(['nightscout', 'pebble_any'])
-    ]
-}
-
-apple_watch_apps = {
-    # Github: https://github.com/nightscout/nightscout-apple-watch
-    # Apple Store: https://itunes.apple.com/us/app/mybg-continuous-glucose-monitor/id993805949?ls=1&mt=8
-    'mybg': [
-        set(['nightscout', 'apple watch'])
-    ],
-
-    # Github: https://github.com/someoneAnyone/Nightscouter
-    # Apple Store: https://itunes.apple.com/us/app/nightscouter/id1010503247?mt=8
-    'nightscouter': [
-        set(['nightscout', 'apple watch'])
-    ],
-
-    # Github: https://github.com/nightscout/nightguard
-    # Apple Store: ?
-    # Gitter: https://gitter.im/nightscout/nightguard
-    'nightguard': [
-        set(['nightscout', 'apple watch'])
-    ]
-}
+]
 
 def check_list(need_list, have):
     for need in need_list:
@@ -116,23 +120,52 @@ def check_list(need_list, have):
             return True
     return False
 
-have = set(['dexcom g4 share', 'android', 'pebble time'])
-possible_projects = []
+def check_possible_projects(have):
+    possible_projects = []
+    for prerequisite_name in prerequisites.keys():
+        if check_list(prerequisites[prerequisite_name], have):
+            have.add(prerequisite_name)
 
-for prerequisite_name in prerequisites.keys():
-    print prerequisite_name
-    if check_list(prerequisites[prerequisite_name], have):
-        have.add(prerequisite_name)
+    for watchface in pebble_watchfaces:
+        if check_list(watchface.requirements, have):
+            possible_projects.append(watchface)
 
-for app in pebble_apps.keys():
-    if check_list(pebble_apps[app], have):
-        possible_projects.append(app)
+    for app in apple_watch_apps:
+        if check_list(app.requirements, have):
+            possible_projects.append(app)
+    return possible_projects
 
-possible_watchfaces = []
+phones = [
+    'android',
+    'ios'
+]
 
-for project in watchfaces:
-    if check_list(project.requirements, have):
-        possible_watchfaces.append(project.name)
+pumps = [
+    'medtronic 522/722',
+    'medtronic 523/723',
+    'medtronic 523/722 with update'
+]
 
-print possible_projects
-print possible_watchfaces
+cgms = [
+    'dexcom g5'
+    'dexcom g4 share',
+    'dexcom g4',
+    'medtronic 530g/veo',
+    'medtronic minimed connect',
+    'medtronic 640g',
+    'freestyle libre'
+]
+
+extra_hardware = [
+    'rileylink',
+    'xDrip'
+]
+
+if __name__ == "__main__":
+    have = set(['dexcom g4 share', 'android', 'pebble time', 'apple_watch'])
+    projects = check_possible_projects(have)
+    for project in projects:
+        print "You can download %s at %s" % (project.name, project.store_url)
+        print "You can contribute to %s at %s" % (project.name, project.github)
+    have = set(['android'])
+    print check_possible_projects(have)
